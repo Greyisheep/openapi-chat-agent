@@ -1,0 +1,20 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - DEBUG=true
+      - SECRET_KEY=test-secret-key-for-poc
+      - ALGORITHM=HS256
+      - ADK_MODEL_PROVIDER=gemini
+      - ADK_MODEL_NAME=gemini-2.5-flash
+      - ADK_API_KEY=${GOOGLE_API_KEY}
+      - GOOGLE_MODEL_NAME=gemini-2.5-flash
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
