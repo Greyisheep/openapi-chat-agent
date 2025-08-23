@@ -92,7 +92,7 @@ uvicorn app.main:app --reload
 
 ## 👤 Authentication & User Management
 
-The platform now requires user authentication. Here's how to get started:
+This platform now requires user authentication. Here's how to get started:
 
 **1. Register a User:**
 ```bash
