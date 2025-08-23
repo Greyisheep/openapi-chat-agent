@@ -12,12 +12,13 @@ Access the interactive API documentation at: `/docs`
 
 ### 🚀 **NEW: Enhanced Features (v1.0)**
 
-- 🔐 **Multi-Authentication Support**: Bearer tokens, OAuth2, API keys with JWT-based security
-- 💰 **User-Provided API Keys**: Users can bring their own Gemini API keys for cost control
+- 🔐 **Smart Authentication System**: Automatically detects API auth types (GitHub: `token`, Slack: `Bearer`, others: `API-key`)
+- 💰 **User-Provided API Keys**: Users can bring their own Gemini API keys for cost control  
 - 🗄️ **PostgreSQL Database**: Production-ready data persistence with Alembic migrations
-- 🎯 **Agent Marketplace**: Pre-built templates for GitHub, Slack, HTTPBin, and more
-- 👤 **User Management**: Complete authentication system with registration and profiles
-- 🛡️ **Enterprise Security**: Token revocation, encrypted storage, audit logging
+- 🎯 **Agent Marketplace**: Pre-built templates for GitHub, Slack, HTTPBin, JSONPlaceholder
+- 👤 **User Management**: JWT authentication, registration, profiles, password management
+- 🛡️ **Enterprise Security**: Token revocation, AES-encrypted API keys, audit logging
+- 💬 **Natural Conversations**: Chat with APIs like "create GitHub issue" or "list my repos"
 
 ### 🎯 **Core Features**
 
@@ -90,6 +91,44 @@ pip install -e .
 uvicorn app.main:app --reload
 ```
 
+## 🎯 What You Can Do
+
+### 🐙 **GitHub Integration** 
+Create a GitHub agent and chat naturally:
+```bash
+"Get my GitHub user information"
+"List my repositories" 
+"Create an issue in my openapi-chat-agent repo"
+"Show recent commits"
+"Get repository information for owner/repo-name"
+```
+
+### 💬 **Slack Integration**
+Manage Slack workspaces conversationally:
+```bash
+"Send message to #general channel"
+"List all channels"
+"Get channel information"
+"Create a new channel"
+```
+
+### 🧪 **Testing & Development**
+Use HTTPBin and JSONPlaceholder for testing:
+```bash
+"Get my IP address"
+"Test HTTP headers"
+"Fetch all posts"
+"Create a new post"
+"Get user information"
+```
+
+### 🔗 **Any OpenAPI Service**
+The platform works with **any** OpenAPI-compliant API:
+- REST APIs with Bearer/Token/API-key authentication
+- Automatic tool generation from OpenAPI specs
+- Smart authentication detection
+- Natural language to API call conversion
+
 ## 👤 Authentication & User Management
 
 This platform now requires user authentication. Here's how to get started:
@@ -128,19 +167,25 @@ curl -X POST http://localhost:8000/auth/api-keys/gemini \
 
 ## 🎯 Agent Marketplace
 
-Browse and create agents from pre-built templates:
+Choose from pre-built templates with smart authentication:
 
-**1. Browse Available Templates:**
+### 📋 **Available Templates**
+
+| Template | Authentication | Use Cases |
+|----------|---------------|-----------|
+| **🐙 GitHub** | `Authorization: token <token>` | Manage repos, issues, PRs, commits |
+| **💬 Slack** | `Authorization: Bearer <token>` | Send messages, manage channels |
+| **🧪 HTTPBin** | No auth required | HTTP testing, debugging, learning |
+| **📄 JSONPlaceholder** | No auth required | Demo posts, comments, users |
+
+### 🚀 **Quick Template Usage**
+
+**Browse Templates:**
 ```bash
 curl http://localhost:8000/marketplace/templates
 ```
 
-**2. Get Template Details:**
-```bash
-curl http://localhost:8000/marketplace/templates/github
-```
-
-**3. Create Agent from Template:**
+**Create GitHub Agent:**
 ```bash
 curl -X POST http://localhost:8000/marketplace/templates/github/create-agent \
   -H 'Content-Type: application/json' \
@@ -150,6 +195,13 @@ curl -X POST http://localhost:8000/marketplace/templates/github/create-agent \
     "api_key": "YOUR_GITHUB_PERSONAL_ACCESS_TOKEN",
     "custom_instructions": "Focus on helping with open source projects."
   }'
+```
+
+**Then Chat:**
+```bash
+curl -X POST http://localhost:8000/api/v1/agents/{agent_id}/chat \
+  -H 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+  -d '{"message": "Create an issue titled \"Bug Report\" in my main repository"}'
 ```
 
 ## 🔧 Manual Agent Creation
@@ -174,6 +226,34 @@ curl -X POST http://localhost:8000/api/v1/agents/{agent_id}/chat \
   -H 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
   -d '{"message": "What can you help me with?"}'
 ```
+
+## 💬 Example Conversations
+
+### 🐙 **GitHub Agent in Action**
+
+```bash
+User: "Get my GitHub user information"
+Agent: "Here is your GitHub user information:
+• Name: Claret Ibeawuchi
+• Username: Greyisheep  
+• Bio: Data Scientist and Full-Stack Developer...
+• Followers: 28
+• Following: 120
+• Public Repositories: 70"
+
+User: "Get info about my openapi-chat-agent repository"
+Agent: "Here is the information for the Greyisheep/openapi-chat-agent repository:
+• Language: Python
+• Stars: 0 • Forks: 0 • Issues: 0
+• Created: 2025-08-23
+• Description: Not set
+• URL: https://github.com/Greyisheep/openapi-chat-agent"
+
+User: "Create an issue titled 'Add Docker support'"  
+Agent: "I'll create that issue for you in your repository..."
+```
+
+**✨ The smart authentication system automatically used `Authorization: token <token>` for GitHub!**
 
 ## 🔌 API Endpoints
 
@@ -229,11 +309,15 @@ curl -X POST http://localhost:8000/api/v1/agents/{agent_id}/chat \
 - **Connection Pooling**: Optimized database performance
 
 ### 🔐 **Security & Authentication**
-- **JWT-Based Authentication**: Secure token-based user sessions
-- **Multi-Auth Support**: Bearer tokens, OAuth2, API key authentication
-- **Password Security**: bcrypt hashing with configurable rounds
-- **Token Management**: Revocation, refresh, and audit logging
-- **Data Encryption**: AES encryption for sensitive user data
+- **Smart Auth Detection**: Automatically configures authentication for different APIs:
+  - GitHub: `Authorization: token <token>`
+  - Slack: `Authorization: Bearer <token>` 
+  - Others: `X-API-Key: <token>` or custom headers
+- **JWT-Based User Auth**: Secure token-based sessions with refresh/revocation
+- **AES Encryption**: User API keys encrypted at rest with platform key
+- **Password Security**: bcrypt hashing (configurable rounds)
+- **Token Management**: Access tokens, refresh tokens, revocation, audit trails
+- **Database Security**: Async PostgreSQL with connection pooling and migrations
 
 ### 🐳 **Infrastructure**
 - **Docker Compose**: Multi-service orchestration (API + PostgreSQL + PgAdmin)
