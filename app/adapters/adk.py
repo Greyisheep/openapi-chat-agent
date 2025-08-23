@@ -33,7 +33,10 @@ class ADKAgentWrapper:
 		openapi_spec: Dict[str, Any],
 		api_key: str,
 		model_name: Optional[str] = None,
-		callback_handler: Optional[Any] = None
+		callback_handler: Optional[Any] = None,
+		auth_type: str = "bearer",
+		auth_header: str = "Authorization", 
+		auth_prefix: Optional[str] = None
 	):
 		adk_components = _import_adk()
 		
@@ -41,6 +44,9 @@ class ADKAgentWrapper:
 		self._openapi_spec = openapi_spec
 		self._api_key = api_key
 		self._model_name = model_name or "gemini-2.5-flash"
+		self._auth_type = auth_type
+		self._auth_header = auth_header
+		self._auth_prefix = auth_prefix
 		
 		# Create ADK model - we need to set the Google API key as an environment variable
 		import os
@@ -53,14 +59,40 @@ class ADKAgentWrapper:
 		)
 		
 		# Create OpenAPI toolset from user's spec
-		if api_key and api_key.strip():
-			# Only set up authentication if API key is provided
+		if api_key and api_key.strip() and self._auth_type != "none":
+			# Only set up authentication if API key is provided and auth type is not none
 			from google.adk.tools.openapi_tool.auth import auth_helpers
 			
-			# Create auth scheme and credential for API key
-			auth_scheme, auth_credential = auth_helpers.token_to_scheme_credential(
-				"apikey", "header", "X-API-Key", api_key
-			)
+			# Build the authentication value based on the auth configuration
+			if self._auth_type == "token":
+				# GitHub style: Authorization: token <token>
+				auth_value = f"token {api_key}"
+				auth_scheme, auth_credential = auth_helpers.token_to_scheme_credential(
+					"apikey", "header", self._auth_header, auth_value
+				)
+			elif self._auth_type == "bearer":
+				# Standard Bearer: Authorization: Bearer <token>
+				auth_value = f"Bearer {api_key}"
+				auth_scheme, auth_credential = auth_helpers.token_to_scheme_credential(
+					"bearer", "header", self._auth_header, auth_value
+				)
+			elif self._auth_type == "api_key":
+				# API Key style: X-API-Key: <token>
+				auth_scheme, auth_credential = auth_helpers.token_to_scheme_credential(
+					"apikey", "header", self._auth_header, api_key
+				)
+			elif self._auth_type == "custom" and self._auth_prefix:
+				# Custom prefix: <header>: <prefix> <token>
+				auth_value = f"{self._auth_prefix} {api_key}"
+				auth_scheme, auth_credential = auth_helpers.token_to_scheme_credential(
+					"apikey", "header", self._auth_header, auth_value
+				)
+			else:
+				# Fallback to bearer if no specific type matches
+				auth_value = f"Bearer {api_key}"
+				auth_scheme, auth_credential = auth_helpers.token_to_scheme_credential(
+					"bearer", "header", self._auth_header, auth_value
+				)
 			
 			self._openapi_toolset = adk_components['OpenAPIToolset'](
 				spec_dict=openapi_spec,
