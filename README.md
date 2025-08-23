@@ -1,65 +1,56 @@
-# OpenAPI Chat Agent
+# 🤖 OpenAPI Conversational Agent Platform
 
-A chat agent that can interact with OpenAPI specifications and provide intelligent responses.
+**Transform any OpenAPI specification into an intelligent conversational agent using Google ADK**
 
-## Features
+## 🌐 Live Demo
 
-- Chat interface for OpenAPI specifications
-- Intelligent agent responses
-- Docker containerization
-- CI/CD pipeline with GitHub Actions
+**Try it now:** [https://paradise-newman-shareholders-earning.trycloudflare.com](https://paradise-newman-shareholders-earning.trycloudflare.com)
 
-## Quick Start
+Access the interactive API documentation at: `/docs`
 
-1. Clone the repository
-2. Install dependencies: `pip install -e .`
-3. Run the application: `uvicorn app.main:app --reload`
+## ✨ Features
 
-## Docker
+- 🔗 **OpenAPI Integration**: Convert any OpenAPI spec into functional tools
+- 🧠 **Google ADK Agents**: Powered by real Google ADK with Gemini models
+- 📞 **Tool Execution Monitoring**: Before/after callbacks for all API interactions
+- 🎯 **Custom Instructions**: Combine system prompts with user-specific context
+- 🔐 **Secure Credential Storage**: Encrypted API key handling
+- 🐳 **Docker Ready**: Modern containerized deployment with Docker Compose
+- 🚀 **CI/CD Pipeline**: Automated deployment with GitHub Actions
+- 🌐 **HTTPS Tunnel**: Secure access via Cloudflare Tunnel
+- 📊 **Conversation History**: Track all interactions and tool executions
+- 🛠️ **RESTful API**: Full API for programmatic access
 
-Build and run with Docker Compose:
+## 🚀 Quick Start
 
+### Option 1: Use the Live Demo
+Visit [https://paradise-newman-shareholders-earning.trycloudflare.com/docs](https://paradise-newman-shareholders-earning.trycloudflare.com/docs) and interact with the API directly.
+
+### Option 2: Run Locally
+
+**With Docker (Recommended):**
 ```bash
+git clone https://github.com/Greyisheep/openapi-chat-agent.git
+cd openapi-chat-agent
 docker compose up -d
 ```
 
-## CI/CD
-
-This project uses GitHub Actions for automated deployment to Hetzner Cloud.
-
-**Test deployment triggered!** 🚀
-
-# OpenAPI Conversational Agent Platform (PoC)
-
-**Transform any OpenAPI specification into a conversational agent using Google ADK**
-
-## Features
-
-- **Google ADK Integration**: Uses real ADK LLM agents with OpenAPI toolsets
-- **Before/After Tool Callbacks**: Monitor and log all API interactions
-- **User-Provided Instructions**: Combine system instructions with user context
-- **Secure API Key Handling**: Encrypted storage of user credentials
-- **Docker + uv**: Modern containerized deployment
-
-## Quick Start
-
-**Build and Run:**
-
+**Or Build from Source:**
 ```bash
-docker build -t openapi-chat-agent .
-docker run --rm -p 8000:8000 openapi-chat-agent
+pip install -e .
+uvicorn app.main:app --reload
 ```
 
 **Health Check:**
-
 ```bash
-curl http://localhost:8000/health
+curl https://paradise-newman-shareholders-earning.trycloudflare.com/health
+# or locally: curl http://localhost:8000/health
 ```
 
 **Create an Agent:**
 
 ```bash
-curl -X POST http://localhost:8000/api/v1/agents/ \
+curl -X POST https://paradise-newman-shareholders-earning.trycloudflare.com/api/v1/agents/ \
   -H 'Content-Type: application/json' \
   -d '{
     "name": "Petstore Manager",
@@ -86,7 +77,7 @@ curl -X POST http://localhost:8000/api/v1/agents/ \
 
 ```bash
 # Replace {agent_id} with the returned agent ID
-curl -X POST http://localhost:8000/api/v1/agents/{agent_id}/chat \
+curl -X POST https://paradise-newman-shareholders-earning.trycloudflare.com/api/v1/agents/{agent_id}/chat \
   -H 'Content-Type: application/json' \
   -d '{"message": "Show me all available pets"}'
 ```
@@ -94,24 +85,60 @@ curl -X POST http://localhost:8000/api/v1/agents/{agent_id}/chat \
 **View Tool Execution History:**
 
 ```bash
-curl http://localhost:8000/api/v1/agents/{agent_id}/tool-executions
+curl https://paradise-newman-shareholders-earning.trycloudflare.com/api/v1/agents/{agent_id}/tool-executions
 ```
 
-## API Endpoints
+## 🔌 API Endpoints
 
-- `GET /health` - Health check
-- `POST /api/v1/agents/` - Create new agent
-- `GET /api/v1/agents/` - List all agents  
-- `GET /api/v1/agents/{id}` - Get agent info
-- `POST /api/v1/agents/{id}/chat` - Chat with agent
-- `GET /api/v1/agents/{id}/tools` - List agent's available tools
-- `GET /api/v1/agents/{id}/conversations` - Get conversation history
-- `GET /api/v1/agents/{id}/tool-executions` - Get tool execution history
-- `DELETE /api/v1/agents/{id}` - Delete agent
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/health` | Health check |
+| `POST` | `/api/v1/agents/` | Create new agent |
+| `GET` | `/api/v1/agents/` | List all agents |
+| `GET` | `/api/v1/agents/{id}` | Get agent info |
+| `POST` | `/api/v1/agents/{id}/chat` | Chat with agent |
+| `GET` | `/api/v1/agents/{id}/tools` | List agent's available tools |
+| `GET` | `/api/v1/agents/{id}/conversations` | Get conversation history |
+| `GET` | `/api/v1/agents/{id}/tool-executions` | Get tool execution history |
+| `DELETE` | `/api/v1/agents/{id}` | Delete agent |
 
-## Architecture
+**Interactive Documentation:** [https://paradise-newman-shareholders-earning.trycloudflare.com/docs](https://paradise-newman-shareholders-earning.trycloudflare.com/docs)
 
-- **ADK LLM Agents**: Real Google ADK agents with Gemini models
-- **OpenAPI Toolsets**: Automatic tool generation from OpenAPI specs
-- **Callback System**: Before/after hooks for every tool execution
-- **Graceful Fallback**: Works with or without ADK installed
+## 🏗️ Architecture
+
+- **🧠 ADK LLM Agents**: Real Google ADK agents powered by Gemini models
+- **🔧 OpenAPI Toolsets**: Automatic tool generation from OpenAPI specifications
+- **📊 Callback System**: Before/after hooks for comprehensive tool execution monitoring
+- **🛡️ Graceful Fallback**: Works with or without ADK installed
+- **🔐 Security**: Encrypted API key storage and secure credential handling
+- **☁️ Cloud-Ready**: Containerized with Docker and deployed via CI/CD
+
+## 🚀 Deployment
+
+This project features **automated deployment** with every push to the main branch:
+
+1. **GitHub Actions** triggers on push to `main`
+2. **Builds** Docker container on Hetzner Cloud
+3. **Deploys** with zero downtime
+4. **Cloudflare Tunnel** provides secure HTTPS access
+
+### Infrastructure
+- **Server**: Hetzner Cloud VPS
+- **Container**: Docker + Docker Compose
+- **Tunnel**: Cloudflare Tunnel for HTTPS
+- **CI/CD**: GitHub Actions
+
+## 📝 License
+
+This project is a Proof of Concept (PoC) for demonstrating OpenAPI to conversational agent transformation.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Push to main branch (auto-deploys!)
+
+---
+
+**Live Demo**: [https://paradise-newman-shareholders-earning.trycloudflare.com](https://paradise-newman-shareholders-earning.trycloudflare.com) 🚀
