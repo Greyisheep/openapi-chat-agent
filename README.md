@@ -1,3 +1,34 @@
+# OpenAPI Chat Agent
+
+A chat agent that can interact with OpenAPI specifications and provide intelligent responses.
+
+## Features
+
+- Chat interface for OpenAPI specifications
+- Intelligent agent responses
+- Docker containerization
+- CI/CD pipeline with GitHub Actions
+
+## Quick Start
+
+1. Clone the repository
+2. Install dependencies: `pip install -e .`
+3. Run the application: `uvicorn app.main:app --reload`
+
+## Docker
+
+Build and run with Docker Compose:
+
+```bash
+docker compose up -d
+```
+
+## CI/CD
+
+This project uses GitHub Actions for automated deployment to Hetzner Cloud.
+
+**Test deployment triggered!** 🚀
+
 # OpenAPI Conversational Agent Platform (PoC)
 
 **Transform any OpenAPI specification into a conversational agent using Google ADK**
