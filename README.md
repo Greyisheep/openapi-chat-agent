@@ -4,7 +4,7 @@
 
 ## 🌐 Live Demo
 
-**Try it now:** [https://paradise-newman-shareholders-earning.trycloudflare.com](https://paradise-newman-shareholders-earning.trycloudflare.com)
+**Try it now:** [https://unable-interactive-trends-books.trycloudflare.com](https://unable-interactive-trends-books.trycloudflare.com)
 
 Access the interactive API documentation at: `/docs`
 
@@ -50,7 +50,7 @@ cp .env.example .env
 ## 🚀 Quick Start
 
 ### Option 1: Use the Live Demo
-Visit [https://paradise-newman-shareholders-earning.trycloudflare.com/docs](https://paradise-newman-shareholders-earning.trycloudflare.com/docs) and interact with the API directly.
+Visit [https://unable-interactive-trends-books.trycloudflare.com/docs](https://unable-interactive-trends-books.trycloudflare.com/docs) and interact with the API directly.
 
 ### Option 2: Run Locally with Docker (Recommended)
 
@@ -199,7 +199,7 @@ curl -X POST http://localhost:8000/marketplace/templates/github/create-agent \
 
 **Then Chat:**
 ```bash
-curl -X POST http://localhost:8000/api/v1/agents/{agent_id}/chat \
+curl -X POST https://unable-interactive-trends-books.trycloudflare.com/api/v1/agents/{agent_id}/chat \
   -H 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
   -d '{"message": "Create an issue titled \"Bug Report\" in my main repository"}'
 ```
@@ -208,7 +208,7 @@ curl -X POST http://localhost:8000/api/v1/agents/{agent_id}/chat \
 
 **Create a Custom Agent:**
 ```bash
-curl -X POST http://localhost:8000/api/v1/agents/ \
+curl -X POST https://unable-interactive-trends-books.trycloudflare.com/api/v1/agents/ \
   -H 'Content-Type: application/json' \
   -H 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
   -d '{
@@ -221,7 +221,7 @@ curl -X POST http://localhost:8000/api/v1/agents/ \
 
 **Chat with Your Agent:**
 ```bash
-curl -X POST http://localhost:8000/api/v1/agents/{agent_id}/chat \
+curl -X POST https://unable-interactive-trends-books.trycloudflare.com/api/v1/agents/{agent_id}/chat \
   -H 'Content-Type: application/json' \
   -H 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
   -d '{"message": "What can you help me with?"}'
@@ -292,7 +292,7 @@ Agent: "I'll create that issue for you in your repository..."
 | `GET` | `/api/v1/agents/{id}/tool-executions` | Get tool execution history |
 | `DELETE` | `/api/v1/agents/{id}` | Delete agent |
 
-**Interactive Documentation:** [http://localhost:8000/docs](http://localhost:8000/docs) | [Live Demo](https://paradise-newman-shareholders-earning.trycloudflare.com/docs)
+**Interactive Documentation:** [http://localhost:8000/docs](http://localhost:8000/docs) | [Live Demo](https://unable-interactive-trends-books.trycloudflare.com/docs)
 
 ## 🏗️ Architecture
 
@@ -373,4 +373,4 @@ This project is a Proof of Concept (PoC) for demonstrating OpenAPI to conversati
 
 ---
 
-**Live Demo**: [https://paradise-newman-shareholders-earning.trycloudflare.com](https://paradise-newman-shareholders-earning.trycloudflare.com) 🚀
+**Live Demo**: [https://unable-interactive-trends-books.trycloudflare.com](https://unable-interactive-trends-books.trycloudflare.com) 🚀
