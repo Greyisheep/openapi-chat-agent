@@ -1,0 +1,132 @@
+name: Postman API Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to test against'
+        required: true
+        default: 'local'
+        type: choice
+        options:
+        - local
+        - staging
+        - production
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x, 20.x]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: |
+        npm install -g newman
+        npm install -g newman-reporter-html
+        npm install -g newman-reporter-junit
+        npm install
+        
+    - name: Start API server (local testing)
+      if: github.event.inputs.environment == 'local' || github.event_name != 'workflow_dispatch'
+      run: |
+        # Start your API server here
+        # Example: docker-compose up -d
+        # Or: npm start &
+        echo "Starting local API server..."
+        # Add your server startup command here
+        
+    - name: Wait for API server
+      if: github.event.inputs.environment == 'local' || github.event_name != 'workflow_dispatch'
+      run: |
+        # Wait for server to be ready
+        timeout 60 bash -c 'until curl -f http://localhost:8000/health/; do sleep 2; done'
+        
+    - name: Run Postman tests
+      env:
+        BASE_URL: ${{ github.event.inputs.environment == 'staging' && 'https://staging-api.example.com' || github.event.inputs.environment == 'production' && 'https://api.example.com' || 'http://localhost:8000' }}
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        SAMPLE_API_KEY: ${{ secrets.SAMPLE_API_KEY }}
+      run: |
+        # Update environment variables
+        node -e "
+        const fs = require('fs');
+        const env = JSON.parse(fs.readFileSync('OpenAPI_Chat_Agent_Environment.postman_environment.json', 'utf8'));
+        env.values.find(v => v.key === 'base_url').value = process.env.BASE_URL;
+        env.values.find(v => v.key === 'gemini_api_key').value = process.env.GEMINI_API_KEY || '';
+        env.values.find(v => v.key === 'sample_api_key').value = process.env.SAMPLE_API_KEY || 'test-key';
+        fs.writeFileSync('OpenAPI_Chat_Agent_Environment.postman_environment.json', JSON.stringify(env, null, 2));
+        "
+        
+        # Run tests
+        node postman-tests.js --base-url $BASE_URL --reporters cli,json,html --bail
+        
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      with:
+        name: postman-test-results-${{ matrix.node-version }}
+        path: |
+          test-results.json
+          test-results.html
+        retention-days: 30
+        
+    - name: Publish test results
+      if: always()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          
+          if (fs.existsSync('test-results.json')) {
+            const results = JSON.parse(fs.readFileSync('test-results.json', 'utf8'));
+            
+            const summary = results.run.stats;
+            const failures = results.run.failures;
+            
+            let comment = `## Postman API Tests - Node.js ${{ matrix.node-version }}\n\n`;
+            comment += `**Environment:** ${{ github.event.inputs.environment || 'local' }}\n`;
+            comment += `**Base URL:** ${{ env.BASE_URL }}\n\n`;
+            comment += `### Results\n`;
+            comment += `- ✅ Passed: ${summary.assertions.passed}\n`;
+            comment += `- ❌ Failed: ${summary.assertions.failed}\n`;
+            comment += `- ⏭️ Skipped: ${summary.assertions.skipped}\n`;
+            comment += `- 📝 Total: ${summary.assertions.total}\n`;
+            comment += `- ⏱️ Duration: ${results.run.timings.completed - results.run.timings.started}ms\n\n`;
+            
+            if (failures.length > 0) {
+              comment += `### Failures\n`;
+              failures.forEach((failure, index) => {
+                comment += `${index + 1}. **${failure.source.name}**: ${failure.error.message}\n`;
+              });
+            }
+            
+            if (github.event_name === 'pull_request') {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            }
+          }
+          
+    - name: Fail on test errors
+      if: failure()
+      run: |
+        echo "❌ Postman tests failed!"
+        exit 1

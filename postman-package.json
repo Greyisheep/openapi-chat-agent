@@ -1,0 +1,48 @@
+{
+  "name": "openapi-chat-agent-postman-tests",
+  "version": "1.0.0",
+  "description": "Postman collection and automated tests for OpenAPI Chat Agent API",
+  "main": "postman-tests.js",
+  "scripts": {
+    "test": "node postman-tests.js",
+    "test:local": "node postman-tests.js --base-url http://localhost:8000",
+    "test:staging": "node postman-tests.js --base-url https://staging-api.example.com",
+    "test:production": "node postman-tests.js --base-url https://api.example.com",
+    "test:ci": "node postman-tests.js --reporters cli,json --bail",
+    "test:html": "node postman-tests.js --reporters cli,html",
+    "test:junit": "node postman-tests.js --reporters cli,junit",
+    "install:newman": "npm install -g newman",
+    "install:newman-reporter-html": "npm install -g newman-reporter-html",
+    "install:newman-reporter-junit": "npm install -g newman-reporter-junit"
+  },
+  "keywords": [
+    "postman",
+    "newman",
+    "api-testing",
+    "automation",
+    "openapi",
+    "chat-agent"
+  ],
+  "author": "OpenAPI Chat Agent Team",
+  "license": "MIT",
+  "dependencies": {
+    "newman": "^6.0.0"
+  },
+  "devDependencies": {
+    "newman-reporter-html": "^1.0.5",
+    "newman-reporter-junit": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/openapi-chat-agent.git"
+  },
+  "files": [
+    "OpenAPI_Chat_Agent_API.postman_collection.json",
+    "OpenAPI_Chat_Agent_Environment.postman_environment.json",
+    "postman-tests.js",
+    "POSTMAN_COLLECTION_README.md"
+  ]
+}
