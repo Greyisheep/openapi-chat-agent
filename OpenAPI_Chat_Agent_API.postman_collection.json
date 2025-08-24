@@ -47,7 +47,12 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"{{test_user_email}}\",\n  \"username\": \"{{test_user_username}}\",\n  \"password\": \"{{test_user_password}}\",\n  \"full_name\": \"Test User\"\n}"
+							"raw": "{\n  \"email\": \"{{test_user_email}}\",\n  \"username\": \"{{test_user_username}}\",\n  \"password\": \"{{test_user_password}}\",\n  \"full_name\": \"Test User\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
 							"raw": "{{base_url}}/auth/register",
@@ -113,7 +118,12 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email_or_username\": \"{{test_user_email}}\",\n  \"password\": \"{{test_user_password}}\"\n}"
+							"raw": "{\n  \"email_or_username\": \"{{test_user_email}}\",\n  \"password\": \"{{test_user_password}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
 							"raw": "{{base_url}}/auth/login",
@@ -169,7 +179,12 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"newemail@example.com\",\n  \"username\": \"newusername\",\n  \"full_name\": \"New Full Name\"\n}"
+							"raw": "{\n  \"email\": \"newemail@example.com\",\n  \"username\": \"newusername\",\n  \"full_name\": \"New Full Name\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
 							"raw": "{{base_url}}/auth/me",
@@ -201,7 +216,12 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"current_password\": \"{{test_user_password}}\",\n  \"new_password\": \"NewSecurePass456!\"\n}"
+							"raw": "{\n  \"current_password\": \"{{test_user_password}}\",\n  \"new_password\": \"NewSecurePass456!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
 							"raw": "{{base_url}}/auth/change-password",
@@ -233,7 +253,12 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"gemini_api_key\": \"{{gemini_api_key}}\"\n}"
+							"raw": "{\n  \"gemini_api_key\": \"{{gemini_api_key}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
 							"raw": "{{base_url}}/auth/api-keys/gemini",
@@ -371,7 +396,12 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"My API Agent\",\n  \"openapi_spec\": {\n    \"openapi\": \"3.0.0\",\n    \"info\": {\n      \"title\": \"Sample API\",\n      \"version\": \"1.0.0\"\n    },\n    \"paths\": {\n      \"/hello\": {\n        \"get\": {\n          \"summary\": \"Hello endpoint\",\n          \"responses\": {\n            \"200\": {\n              \"description\": \"OK\"\n            }\n          }\n        }\n      }\n    }\n  },\n  \"user_api_key\": \"{{sample_api_key}}\",\n  \"api_base_url\": \"https://api.example.com\",\n  \"user_instructions\": \"You are a helpful assistant for this API.\"\n}"
+							"raw": "{\n  \"name\": \"My API Agent\",\n  \"openapi_spec\": {\n    \"openapi\": \"3.0.0\",\n    \"info\": {\n      \"title\": \"Sample API\",\n      \"version\": \"1.0.0\"\n    },\n    \"paths\": {\n      \"/hello\": {\n        \"get\": {\n          \"summary\": \"Hello endpoint\",\n          \"responses\": {\n            \"200\": {\n              \"description\": \"OK\"\n            }\n          }\n        }\n      }\n    }\n  },\n  \"user_api_key\": \"{{sample_api_key}}\",\n  \"api_base_url\": \"https://api.example.com\",\n  \"user_instructions\": \"You are a helpful assistant for this API.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/agents/",
@@ -405,7 +435,12 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Petstore Agent\",\n  \"openapi_spec_url\": \"https://petstore3.swagger.io/api/v3/openapi.json\",\n  \"user_api_key\": \"{{sample_api_key}}\",\n  \"api_base_url\": \"https://petstore3.swagger.io/api/v3\",\n  \"user_instructions\": \"You are a helpful assistant for the Petstore API.\"\n}"
+							"raw": "{\n  \"name\": \"Petstore Agent\",\n  \"openapi_spec_url\": \"https://petstore3.swagger.io/api/v3/openapi.json\",\n  \"user_api_key\": \"{{sample_api_key}}\",\n  \"api_base_url\": \"https://petstore3.swagger.io/api/v3\",\n  \"user_instructions\": \"You are a helpful assistant for the Petstore API.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/agents/",
@@ -491,7 +526,12 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"message\": \"Hello, can you help me with this API?\",\n  \"conversation_id\": \"{{conversation_id}}\"\n}"
+							"raw": "{\n  \"message\": \"Hello, can you help me with this API?\",\n  \"conversation_id\": \"{{conversation_id}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
 							"raw": "{{base_url}}/api/v1/agents/{{agent_id}}/chat",
@@ -730,7 +770,12 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"agent_name\": \"My GitHub Assistant\",\n  \"api_key\": \"{{sample_api_key}}\",\n  \"custom_instructions\": \"Focus on helping with open source projects and code reviews.\"\n}"
+							"raw": "{\n  \"agent_name\": \"My GitHub Assistant\",\n  \"api_key\": \"{{sample_api_key}}\",\n  \"custom_instructions\": \"Focus on helping with open source projects and code reviews.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
 							"raw": "{{base_url}}/marketplace/templates/{{template_id}}/create-agent",

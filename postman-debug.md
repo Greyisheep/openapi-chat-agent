@@ -4,7 +4,11 @@
 
 The error you're seeing suggests that Postman is sending the request body as a string instead of proper JSON.
 
-## Debug Steps:
+## SOLUTION APPLIED ✅
+
+I've fixed the Postman collection by adding the `options.raw.language` field to all JSON request bodies. This ensures Postman properly parses the request body as JSON instead of treating it as a plain string.
+
+## Debug Steps (if issues persist):
 
 ### 1. Check Environment Variables
 Make sure you've imported the environment file:
