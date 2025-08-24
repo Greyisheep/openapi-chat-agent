@@ -782,12 +782,15 @@
 			"script": {
 				"type": "text/javascript",
 				"exec": [
-					"// Auto-set Content-Type for JSON requests",
+					"// Auto-set Content-Type for JSON requests (only if not already set)",
 					"if (pm.request.body && pm.request.body.mode === 'raw') {",
-					"    pm.request.headers.add({",
-					"        key: 'Content-Type',",
-					"        value: 'application/json'",
-					"    });",
+					"    const contentTypeHeader = pm.request.headers.get('Content-Type');",
+					"    if (!contentTypeHeader) {",
+					"        pm.request.headers.add({",
+					"            key: 'Content-Type',",
+					"            value: 'application/json'",
+					"        });",
+					"    }",
 					"}",
 					"",
 					"// Auto-add Authorization header for protected endpoints",
@@ -796,10 +799,13 @@
 					"const isProtected = protectedPaths.some(path => currentPath.includes(path));",
 					"",
 					"if (isProtected && pm.environment.get('access_token')) {",
-					"    pm.request.headers.add({",
-					"        key: 'Authorization',",
-					"        value: 'Bearer ' + pm.environment.get('access_token')",
-					"    });",
+					"    const authHeader = pm.request.headers.get('Authorization');",
+					"    if (!authHeader) {",
+					"        pm.request.headers.add({",
+					"            key: 'Authorization',",
+					"            value: 'Bearer ' + pm.environment.get('access_token')",
+					"        });",
+					"    }",
 					"}"
 				]
 			}
