@@ -35,7 +35,7 @@ class WorkflowManager:
         
         start_time = time.time()
         workflow_id = str(uuid.uuid4())
-        conversation_id = workflow_request.conversation_id or f"workflow_{workflow_id}"
+        conversation_id = f"workflow_{workflow_id}"
         
         # Create workflow record
         workflow = Workflow(
