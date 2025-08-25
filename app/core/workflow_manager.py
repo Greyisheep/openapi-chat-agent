@@ -56,7 +56,6 @@ class WorkflowManager:
                 agent_id=step.agent_id,
                 message=step.message,
                 depends_on=step.depends_on,
-                pass_result_to=step.pass_result_to,
                 workflow_id=workflow_id,
                 status="pending"
             )
