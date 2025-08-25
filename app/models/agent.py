@@ -58,4 +58,40 @@ class AgentError(BaseModel):
 	error_code: Optional[str] = None
 
 
+# Workflow Models
+class WorkflowStep(BaseModel):
+	agent_id: str
+	message: str
+	step_name: Optional[str] = None
+	depends_on: Optional[List[str]] = Field(default_factory=list)
+
+
+class WorkflowRequest(BaseModel):
+	workflow_name: str
+	steps: List[WorkflowStep]
+	parallel_execution: bool = False
+
+
+class WorkflowStepResult(BaseModel):
+	step_name: str
+	agent_id: str
+	message: str
+	response: str
+	tools_used: List[str] = Field(default_factory=list)
+	execution_time: float
+	status: str
+	error: Optional[str] = None
+	timestamp: str
+
+
+class WorkflowResponse(BaseModel):
+	workflow_id: str
+	workflow_name: str
+	conversation_id: str
+	steps: List[WorkflowStepResult]
+	total_execution_time: float
+	status: str
+	timestamp: str
+
+
 
