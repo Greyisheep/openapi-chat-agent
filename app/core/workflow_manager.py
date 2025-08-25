@@ -41,7 +41,7 @@ class WorkflowManager:
         workflow = Workflow(
             id=workflow_id,
             name=workflow_request.workflow_name,
-            description=workflow_request.description,
+            description=workflow_request.workflow_name,  # Use workflow_name as description
             conversation_id=conversation_id,
             user_id=user_id,
             status="running"
