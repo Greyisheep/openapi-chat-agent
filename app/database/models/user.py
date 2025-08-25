@@ -37,6 +37,7 @@ class User(Base):
     # Relationships
     agents = relationship("Agent", back_populates="user", cascade="all, delete-orphan")
     auth_tokens = relationship("AuthToken", back_populates="user", cascade="all, delete-orphan")
+    workflows = relationship("Workflow", back_populates="user", cascade="all, delete-orphan")
     
     def __repr__(self) -> str:
         return f"<User(id={self.id}, username={self.username}, email={self.email})>"

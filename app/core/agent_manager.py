@@ -82,7 +82,10 @@ class AgentManager:
 		
 		# Try to initialize ADK agent and update status
 		try:
-			await self._initialize_adk_agent(agent, config['user_api_key'], db)
+			# Use platform key for initialization since user doesn't have a Gemini key
+			from app.core.config import settings
+			platform_key = settings.ADK_API_KEY
+			await self._initialize_adk_agent(agent, platform_key, db)
 			agent.status = AgentStatus.ACTIVE
 		except ADKUnavailable as e:
 			logger.warning(f"ADK not available for agent {agent_id}: {e}")
@@ -126,15 +129,18 @@ class AgentManager:
 		
 		# Get or create ADK agent
 		adk_agent = await self._get_or_create_adk_agent(agent, db)
+		logger.info(f"ADK agent for {agent_id}: {adk_agent is not None}")
 		
 		# Chat with agent
 		try:
 			if adk_agent and hasattr(adk_agent, 'chat'):
 				# Real ADK agent
+				logger.info(f"Using real ADK agent for {agent_id}")
 				response = await adk_agent.chat(message)
 				tool_names = []  # TODO: Extract from callback handler
 			else:
 				# Fallback mode
+				logger.info(f"Using fallback mode for {agent_id} - ADK agent not available")
 				response = f"I can help you with {agent.tool_count} API endpoints. What would you like me to do?"
 				tool_names = []
 		except Exception as e:
@@ -397,10 +403,17 @@ class AgentManager:
 					if not api_key:
 						raise ValueError("No Gemini API key available")
 			
-			return await self._initialize_adk_agent(agent, api_key, db)
+			# Always use platform key for ADK initialization
+			from app.core.config import settings
+			platform_key = settings.ADK_API_KEY
+			return await self._initialize_adk_agent(agent, platform_key, db)
 			
 		except Exception as e:
 			logger.error(f"Failed to create ADK agent for {agent_id}: {e}")
+			logger.error(f"Exception type: {type(e).__name__}")
+			logger.error(f"Exception details: {str(e)}")
+			import traceback
+			logger.error(f"Traceback: {traceback.format_exc()}")
 			return None
 	
 	def _get_system_instructions(self) -> str:

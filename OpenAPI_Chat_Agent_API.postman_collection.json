@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "openapi-chat-agent-api",
 		"name": "OpenAPI Chat Agent API",
-		"description": "Complete API collection for the OpenAPI Conversational Agent Platform. This collection includes all endpoints for authentication, agent management, marketplace, and health checks.",
+		"description": "Complete API collection for the OpenAPI Conversational Agent Platform. This collection includes all endpoints for authentication, agent management, marketplace, workflow orchestration, and health checks.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "openapi-chat-agent"
 	},
@@ -797,6 +797,243 @@
 			"description": "Marketplace and template management endpoints"
 		},
 		{
+			"name": "Workflows",
+			"item": [
+				{
+					"name": "Simple Chain Workflow",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"agent_ids\": [\"{{github_agent_id}}\", \"{{slack_agent_id}}\"],\n  \"message\": \"GitHub Agent: Get the 3 most recent open issues from facebook/react repository. Slack Agent: Send a summary of these issues to Slack with the title \\\"Recent React Issues\\\".\",\n  \"workflow_name\": \"React Issues to Slack\",\n  \"parallel_execution\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/workflows/simple-chain",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"workflows",
+								"simple-chain"
+							]
+						},
+						"description": "Execute a simple chain workflow with multiple agents"
+					},
+					"response": []
+				},
+				{
+					"name": "Multi-Step Workflow",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"workflow_name\": \"DevOps Automation\",\n  \"steps\": [\n    {\n      \"agent_id\": \"{{github_agent_id}}\",\n      \"message\": \"Get recent commits and pull requests\",\n      \"step_name\": \"fetch_dev_activity\"\n    },\n    {\n      \"agent_id\": \"{{slack_agent_id}}\",\n      \"message\": \"Send development summary to #devops channel\",\n      \"step_name\": \"notify_devops\",\n      \"depends_on\": [\"fetch_dev_activity\"]\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/workflows/multi-step",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"workflows",
+								"multi-step"
+							]
+						},
+						"description": "Execute a multi-step workflow with dependencies"
+					},
+					"response": []
+				},
+				{
+					"name": "List Workflow Templates",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workflows/templates/list",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"workflows",
+								"templates",
+								"list"
+							]
+						},
+						"description": "List available workflow templates"
+					},
+					"response": []
+				},
+				{
+					"name": "Execute Workflow Template",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"template_params\": {\n    \"github_agent_id\": \"{{github_agent_id}}\",\n    \"slack_agent_id\": \"{{slack_agent_id}}\"\n  },\n  \"workflow_name\": \"My Workflow\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/workflows/templates/{{workflow_template_name}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"workflows",
+								"templates",
+								"{{workflow_template_name}}"
+							]
+						},
+						"description": "Execute a workflow template"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Workflow Status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workflows/status/{{workflow_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"workflows",
+								"status",
+								"{{workflow_id}}"
+							]
+						},
+						"description": "Get real-time status of a workflow execution"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Workflow Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workflows/details/{{workflow_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"workflows",
+								"details",
+								"{{workflow_id}}"
+							]
+						},
+						"description": "Get detailed workflow execution results"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Workflow History",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/workflows/history?limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"workflows",
+								"history"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get workflow execution history"
+					},
+					"response": []
+				}
+			],
+			"description": "Multi-agent workflow orchestration endpoints"
+		},
+		{
 			"name": "Root",
 			"item": [
 				{
@@ -881,6 +1118,12 @@
 					"        pm.environment.set('template_id', responseJson.id);",
 					"        console.log('✅ Template ID automatically set:', responseJson.id);",
 					"    }",
+					"    ",
+					"    // Extract workflow_id from workflow responses",
+					"    if (responseJson.workflow_id && pm.request.url.getPath().includes('/workflows/')) {",
+					"        pm.environment.set('workflow_id', responseJson.workflow_id);",
+					"        console.log('✅ Workflow ID automatically set:', responseJson.workflow_id);",
+					"    }",
 					"}",
 					"",
 					"// Validate response structure",
@@ -959,6 +1202,30 @@
 			"value": "",
 			"type": "string",
 			"description": "Conversation ID for chat continuity"
+		},
+		{
+			"key": "github_agent_id",
+			"value": "",
+			"type": "string",
+			"description": "GitHub agent ID for workflow orchestration"
+		},
+		{
+			"key": "slack_agent_id",
+			"value": "",
+			"type": "string",
+			"description": "Slack agent ID for workflow orchestration"
+		},
+		{
+			"key": "workflow_id",
+			"value": "",
+			"type": "string",
+			"description": "Workflow ID for status and details requests"
+		},
+		{
+			"key": "workflow_template_name",
+			"value": "github-to-slack",
+			"type": "string",
+			"description": "Workflow template name for execution"
 		}
 	]
 }

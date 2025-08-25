@@ -301,6 +301,67 @@ Be helpful and concise in your responses, and let users know when operations are
     auth_header="Authorization"
 )
 
+# Slack Webhook Template (for webhook URLs)
+SLACK_WEBHOOK_TEMPLATE = AgentTemplate(
+    id="slack-webhook",
+    name="Slack Webhook Assistant",
+    description="Send messages to Slack using webhook URLs",
+    category=AgentCategory.COMMUNICATION,
+    featured=False,
+    tags=["messaging", "communication", "webhook"],
+    documentation_url="https://api.slack.com/messaging/webhooks",
+    openapi_spec={
+        "openapi": "3.0.0",
+        "info": {
+            "title": "Slack Webhook API",
+            "version": "1.0.0",
+            "description": "Slack Webhook for sending messages to channels"
+        },
+        "servers": [
+            {"url": "https://hooks.slack.com"}
+        ],
+        "paths": {
+            "/services/T095RAVRKQ9/B0958SVSU8N/YAlmWvKPCXnaUvaSQiobaydz": {
+                "post": {
+                    "operationId": "sendWebhookMessage",
+                    "summary": "Send a message via webhook",
+                    "requestBody": {
+                        "required": True,
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "text": {"type": "string", "description": "Message text"},
+                                        "channel": {"type": "string", "description": "Channel name (optional)"},
+                                        "username": {"type": "string", "description": "Bot username (optional)"},
+                                        "icon_emoji": {"type": "string", "description": "Bot icon emoji (optional)"}
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "responses": {"200": {"description": "Message sent successfully"}}
+                }
+            }
+        }
+    },
+    default_instructions="""You are a Slack Webhook assistant that sends messages to Slack channels using webhook URLs.
+
+Your capabilities include:
+- Sending messages to Slack channels via webhook
+- Customizing message appearance (username, icon, etc.)
+
+When asked to send messages:
+1. Use the sendWebhookMessage operation
+2. Include the message text in the request body
+3. Confirm when the message is sent successfully
+
+Be helpful and concise in your responses.""",
+    auth_type="none",
+    auth_header=""
+)
+
 
 # JSONPlaceholder Demo Template
 JSONPLACEHOLDER_TEMPLATE = AgentTemplate(
@@ -475,6 +536,7 @@ AGENT_TEMPLATES = {
     template.id: template for template in [
         GITHUB_TEMPLATE,
         SLACK_TEMPLATE,
+        SLACK_WEBHOOK_TEMPLATE,
         JSONPLACEHOLDER_TEMPLATE,
         HTTPBIN_TEMPLATE,
     ]

@@ -1,7 +1,7 @@
 """Database models package."""
 
 from .user import User
-from .agent import Agent, Conversation, ToolExecution
+from .agent import Agent, Conversation, ToolExecution, Workflow, WorkflowStep
 from .auth_token import AuthToken
 
 __all__ = [
@@ -9,5 +9,7 @@ __all__ = [
     "Agent", 
     "Conversation",
     "ToolExecution",
+    "Workflow",
+    "WorkflowStep",
     "AuthToken",
 ]

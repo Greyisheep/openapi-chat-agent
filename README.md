@@ -10,7 +10,16 @@ Access the interactive API documentation at: `/docs`
 
 ## ✨ Features
 
-### 🚀 **NEW: Enhanced Features (v1.0)**
+### 🚀 **NEW: Multi-Agent Workflow Orchestration (v2.0)**
+
+- 🔗 **Agent Chaining**: Chain multiple agents in a single request for complex multi-API workflows
+- 🔄 **Context Passing**: Automatic data flow between agents with dependency management
+- ⚡ **Sequential & Parallel Execution**: Choose execution mode based on workflow needs
+- 📋 **Workflow Templates**: Pre-built templates for common multi-API scenarios
+- 📊 **Workflow Monitoring**: Track execution status, timing, and results per step
+- 🎯 **Smart Dependencies**: Automatic dependency resolution and context injection
+
+### 🚀 **Enhanced Features (v1.0)**
 
 - 🔐 **Smart Authentication System**: Automatically detects API auth types (GitHub: `token`, Slack: `Bearer`, others: `API-key`)
 - 💰 **User-Provided API Keys**: Users can bring their own Gemini API keys for cost control  
@@ -255,6 +264,377 @@ Agent: "I'll create that issue for you in your repository..."
 
 **✨ The smart authentication system automatically used `Authorization: token <token>` for GitHub!**
 
+## 🔗 Multi-Agent Workflow Orchestration
+
+### 🎯 **Getting Started in 3 Steps**
+
+#### **Step 1: Create Your Agents**
+```bash
+# Create a GitHub agent
+curl -X POST "http://localhost:8000/marketplace/templates/github/create-agent" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your_token" \
+  -d '{"api_key": "your-github-token"}'
+
+# Create a Slack webhook agent (replace YOUR_WEBHOOK_URL)
+curl -X POST "http://localhost:8000/api/v1/agents/" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your_token" \
+  -d '{
+    "name": "Slack Notifications",
+    "openapi_spec": {
+      "openapi": "3.0.0",
+      "info": {"title": "Slack Webhook API", "version": "1.0.0"},
+      "servers": [{"url": "https://hooks.slack.com"}],
+      "paths": {
+        "/services/YOUR_WEBHOOK_PATH": {
+          "post": {
+            "operationId": "sendMessage",
+            "requestBody": {
+              "required": true,
+              "content": {
+                "application/json": {
+                  "schema": {"type": "object", "properties": {"text": {"type": "string"}}}
+                }
+              }
+            },
+            "responses": {"200": {"description": "Message sent"}}
+          }
+        }
+      }
+    },
+    "user_api_key": "",
+    "user_instructions": "Send messages to Slack using the sendMessage operation",
+    "api_base_url": "https://hooks.slack.com",
+    "auth_type": "none"
+  }'
+```
+
+#### **Step 2: Test Individual Agents**
+```bash
+# Test GitHub agent
+curl -X POST "http://localhost:8000/api/v1/agents/{github-agent-id}/chat" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your_token" \
+  -d '{"message": "Get my repositories"}'
+
+# Test Slack agent
+curl -X POST "http://localhost:8000/api/v1/agents/{slack-agent-id}/chat" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your_token" \
+  -d '{"message": "Send test message to Slack"}'
+```
+
+#### **Step 3: Create Your First Workflow**
+```bash
+curl -X POST "http://localhost:8000/api/v1/workflows/simple-chain" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your_token" \
+  -d '{
+    "agent_ids": ["{github-agent-id}", "{slack-agent-id}"],
+    "message": "GitHub Agent: Get my repositories. Slack Agent: Send the repository list to Slack.",
+    "workflow_name": "My First Multi-API Workflow",
+    "parallel_execution": false
+  }'
+```
+
+### 🚀 Quick Start: Simple Agent Chaining
+
+The simplest way to chain multiple agents together:
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/workflows/simple-chain" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your_token" \
+  -d '{
+    "agent_ids": ["github-agent-id", "slack-agent-id"],
+    "message": "Get my repositories and send a summary to Slack",
+    "workflow_name": "GitHub to Slack Integration",
+    "parallel_execution": false
+  }'
+```
+
+### ⚠️ Important: Agent Initialization
+
+**After container restarts, agents may need to be re-created for optimal performance.** If you encounter fallback responses like "I can help you with X API endpoints", create fresh agents:
+
+```bash
+# Create fresh GitHub agent
+curl -X POST "http://localhost:8000/marketplace/templates/github/create-agent" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your_token" \
+  -d '{"api_key": "your-github-token"}'
+
+# Create fresh Slack webhook agent
+curl -X POST "http://localhost:8000/api/v1/agents/" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your_token" \
+  -d '{
+    "name": "Slack Webhook Agent",
+    "openapi_spec": {
+      "openapi": "3.0.0",
+      "info": {"title": "Slack Webhook API", "version": "1.0.0"},
+      "servers": [{"url": "https://hooks.slack.com"}],
+      "paths": {
+        "/services/YOUR_WEBHOOK_PATH": {
+          "post": {
+            "operationId": "sendMessage",
+            "requestBody": {
+              "required": true,
+              "content": {
+                "application/json": {
+                  "schema": {"type": "object", "properties": {"text": {"type": "string"}}}
+                }
+              }
+            },
+            "responses": {"200": {"description": "Message sent"}}
+          }
+        }
+      }
+    },
+    "user_api_key": "",
+    "user_instructions": "Send messages to Slack using the sendMessage operation",
+    "api_base_url": "https://hooks.slack.com",
+    "auth_type": "none"
+  }'
+```
+
+### 🎯 Advanced: Multi-Step Workflows
+
+For complex workflows with custom messages per step:
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/workflows/multi-step" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your_token" \
+  -d '{
+    "steps": [
+      {
+        "agent_id": "github-agent-id",
+        "message": "List my top 5 most recent repositories",
+        "step_name": "get_repos"
+      },
+      {
+        "agent_id": "slack-agent-id", 
+        "message": "Send repository information to #dev-team channel",
+        "step_name": "notify_team",
+        "depends_on": ["get_repos"]
+      }
+    ],
+    "workflow_name": "Repository Review Workflow",
+    "parallel_execution": false
+  }'
+```
+
+### 📋 Workflow Templates
+
+Use pre-built templates for common scenarios:
+
+```bash
+# List available templates
+curl -X GET "http://localhost:8000/api/v1/workflows/templates/list" \
+  -H "Authorization: Bearer your_token"
+
+# Execute a template
+curl -X POST "http://localhost:8000/api/v1/workflows/templates/github_to_slack" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your_token" \
+  -d '{
+    "template_params": {
+      "github_agent_id": "your-github-agent-id",
+      "slack_agent_id": "your-slack-agent-id"
+    },
+    "workflow_name": "Daily Repo Summary"
+  }'
+```
+
+### 📊 Workflow Monitoring
+
+Track workflow execution status:
+
+```bash
+# Get workflow status
+curl -X GET "http://localhost:8000/api/v1/workflows/status/{workflow_id}" \
+  -H "Authorization: Bearer your_token"
+
+# Get detailed workflow results
+curl -X GET "http://localhost:8000/api/v1/workflows/details/{workflow_id}" \
+  -H "Authorization: Bearer your_token"
+
+# Get workflow history
+curl -X GET "http://localhost:8000/api/v1/workflows/history" \
+  -H "Authorization: Bearer your_token"
+```
+
+### 🔍 **Monitoring & Debugging Workflows**
+
+#### **Check Workflow Status**
+```bash
+# Get real-time status of a running workflow
+curl -X GET "http://localhost:8000/api/v1/workflows/status/{workflow_id}" \
+  -H "Authorization: Bearer your_token"
+
+# Response includes:
+# - execution status (running, completed, failed)
+# - step completion count
+# - total execution time
+# - error details (if any)
+```
+
+#### **Get Detailed Workflow Results**
+```bash
+# Get complete workflow execution details
+curl -X GET "http://localhost:8000/api/v1/workflows/details/{workflow_id}" \
+  -H "Authorization: Bearer your_token"
+
+# Response includes:
+# - Individual step results
+# - Agent responses and tool usage
+# - Execution times per step
+# - Error messages and stack traces
+```
+
+#### **View Workflow History**
+```bash
+# Get recent workflow executions
+curl -X GET "http://localhost:8000/api/v1/workflows/history?limit=10" \
+  -H "Authorization: Bearer your_token"
+```
+
+#### **Debug Individual Steps**
+```bash
+# Test a specific agent before using in workflow
+curl -X POST "http://localhost:8000/api/v1/agents/{agent_id}/chat" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your_token" \
+  -d '{"message": "Your test message here"}'
+```
+
+### 🔄 Workflow Features
+
+| Feature | Description | Example Use Case |
+|---------|-------------|------------------|
+| **Sequential Execution** | Agents run one after another with context passing | GitHub → Process Data → Slack notification |
+| **Parallel Execution** | Agents run simultaneously for independent tasks | Send to multiple channels, fetch from multiple APIs |
+| **Context Passing** | Output from one agent becomes input for the next | Repository data flows from GitHub agent to Slack agent |
+| **Dependencies** | Control execution order with `depends_on` | Ensure data processing before notification |
+| **Templates** | Pre-built workflows for common scenarios | GitHub-to-Slack, code review workflows |
+| **Error Handling** | Graceful failure handling with detailed error reports | Skip failed steps, continue workflow |
+
+### 💡 Real-World Workflow Examples
+
+#### 🎯 **DevOps Automation**
+```json
+{
+  "workflow_name": "Daily DevOps Summary",
+  "steps": [
+    {
+      "agent_id": "github-agent",
+      "message": "Get recent commits and pull requests",
+      "step_name": "fetch_dev_activity"
+    },
+    {
+      "agent_id": "slack-agent",
+      "message": "Send development summary to #devops channel",
+      "step_name": "notify_devops",
+      "depends_on": ["fetch_dev_activity"]
+    }
+  ]
+}
+```
+
+#### 🔄 **Cross-Platform Data Sync**
+```json
+{
+  "workflow_name": "Cross-Platform Sync",
+  "parallel_execution": true,
+  "steps": [
+    {
+      "agent_id": "github-agent",
+      "message": "Get repository metrics",
+      "step_name": "github_metrics"
+    },
+    {
+      "agent_id": "slack-agent",
+      "message": "Get team activity summary",
+      "step_name": "slack_metrics"
+    }
+  ]
+}
+```
+
+#### 📊 **GitHub Issues to Slack Notification**
+```bash
+# Get issues from a repository and send to Slack
+curl -X POST "http://localhost:8000/api/v1/workflows/simple-chain" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your_token" \
+  -d '{
+    "agent_ids": ["github-agent-id", "slack-agent-id"],
+    "message": "GitHub Agent: Get issues from Greyisheep/rent-predictor repository. Slack Agent: Send the GitHub issues data to Slack.",
+    "workflow_name": "GitHub Issues → Slack",
+    "parallel_execution": false
+  }'
+```
+
+### 🔧 Troubleshooting Common Issues
+
+#### ❌ **Problem: Agents give fallback responses**
+**Symptoms**: "I can help you with X API endpoints" or "pet store API" responses
+**Solution**: Re-create agents after container restarts (see Agent Initialization section above)
+
+#### ❌ **Problem: Workflow fails with generic responses**
+**Symptoms**: Agents don't execute their specific tasks
+**Solution**: Use explicit, role-based messages:
+```bash
+# ✅ Good: Explicit role assignment
+"message": "GitHub Agent: Get repositories. Slack Agent: Send data to Slack."
+
+# ❌ Bad: Generic message
+"message": "Get repositories and send to Slack"
+```
+
+#### ❌ **Problem: Context not passed between agents**
+**Symptoms**: Second agent doesn't receive data from first agent
+**Solution**: Ensure sequential execution and proper dependencies:
+```bash
+# ✅ Good: Sequential with dependencies
+"parallel_execution": false
+
+# ❌ Bad: Parallel without context sharing
+"parallel_execution": true
+```
+
+#### ❌ **Problem: Template not found errors**
+**Symptoms**: "Template 'slack-webhook' not found"
+**Solution**: Use the `/templates/list` endpoint to see available templates, or create custom agents
+
+#### ❌ **Problem: Authentication errors**
+**Symptoms**: "Token has been revoked" or "Invalid API key"
+**Solution**: 
+1. Check API key validity
+2. Ensure proper authentication headers
+3. Verify agent has correct API key stored
+
+### 🎯 Best Practices
+
+#### **Message Formatting**
+- **Be explicit about agent roles**: "GitHub Agent: [task]. Slack Agent: [task]."
+- **Use clear, actionable language**: "Get", "Send", "Process", "Notify"
+- **Include context when needed**: "Send the repository data from step 1 to Slack"
+
+#### **Workflow Design**
+- **Start simple**: Use `simple-chain` for basic workflows
+- **Add complexity gradually**: Move to `multi-step` for advanced scenarios
+- **Test individual agents first**: Ensure each agent works before chaining
+- **Monitor execution**: Use status endpoints to track workflow progress
+
+#### **Agent Management**
+- **Create fresh agents after restarts**: Avoid initialization issues
+- **Use descriptive names**: "GitHub-Repo-Agent", "Slack-Notifications-Agent"
+- **Store API keys securely**: Use environment variables or secure storage
+- **Test agent functionality**: Verify each agent works independently first
+
 ## 🔌 API Endpoints
 
 ### 🔐 Authentication Endpoints
@@ -292,7 +672,63 @@ Agent: "I'll create that issue for you in your repository..."
 | `GET` | `/api/v1/agents/{id}/tool-executions` | Get tool execution history |
 | `DELETE` | `/api/v1/agents/{id}` | Delete agent |
 
+### 🔗 Multi-Agent Workflow Endpoints (🔒 Requires Authentication)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/v1/workflows/simple-chain` | Execute simple agent chain |
+| `POST` | `/api/v1/workflows/multi-step` | Execute multi-step workflow |
+| `POST` | `/api/v1/workflows/execute` | Execute advanced workflow |
+| `GET` | `/api/v1/workflows/templates/list` | List workflow templates |
+| `POST` | `/api/v1/workflows/templates/{template_name}` | Execute workflow template |
+| `GET` | `/api/v1/workflows/history` | Get workflow execution history |
+| `GET` | `/api/v1/workflows/details/{workflow_id}` | Get detailed workflow results |
+| `GET` | `/api/v1/workflows/status/{workflow_id}` | Get workflow status |
+
 **Interactive Documentation:** [http://localhost:8000/docs](http://localhost:8000/docs) | [Live Demo](https://unable-interactive-trends-books.trycloudflare.com/docs)
+
+### 📋 **Quick Reference: Common API Patterns**
+
+#### **Authentication**
+```bash
+# Get your token (replace with your credentials)
+curl -X POST "http://localhost:8000/auth/login" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "username=your_username&password=your_password"
+```
+
+#### **List Your Agents**
+```bash
+curl -X GET "http://localhost:8000/api/v1/agents/" \
+  -H "Authorization: Bearer your_token"
+```
+
+#### **Create Agent from Template**
+```bash
+curl -X POST "http://localhost:8000/marketplace/templates/{template_id}/create-agent" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your_token" \
+  -d '{"api_key": "your-api-key"}'
+```
+
+#### **Execute Workflow Template**
+```bash
+curl -X POST "http://localhost:8000/api/v1/workflows/templates/{template_name}" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your_token" \
+  -d '{
+    "template_params": {
+      "github_agent_id": "your-github-agent-id",
+      "slack_agent_id": "your-slack-agent-id"
+    },
+    "workflow_name": "My Workflow"
+  }'
+```
+
+#### **Health Check**
+```bash
+curl -X GET "http://localhost:8000/health"
+```
 
 ## 🏗️ Architecture
 

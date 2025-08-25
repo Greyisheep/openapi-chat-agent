@@ -1,6 +1,6 @@
 """Agent models for managing conversational agents and their data."""
 
-from sqlalchemy import Column, String, Text, DateTime, Integer, ForeignKey, JSON, Enum
+from sqlalchemy import Column, String, Text, DateTime, Integer, ForeignKey, JSON, Enum, Float
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
@@ -131,4 +131,75 @@ class ToolExecution(Base):
     agent = relationship("Agent", back_populates="tool_executions")
     
     def __repr__(self) -> str:
-        return f"<ToolExecution(id={self.id}, tool_name={self.tool_name}, agent_id={self.agent_id})>"
+        return f"<ToolExecution(id={self.id}, agent_id={self.agent_id}, tool_name={self.tool_name})>"
+
+
+class Workflow(Base):
+	"""Workflow model for storing multi-agent workflow executions."""
+	
+	__tablename__ = "workflows"
+	
+	# Primary key
+	id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+	
+	# Workflow configuration
+	name = Column(String(255), nullable=True)
+	description = Column(Text, nullable=True)
+	conversation_id = Column(String(255), nullable=False, index=True)
+	
+	# Execution metadata
+	status = Column(String(50), default="running", nullable=False)  # running, completed, failed, partial_success
+	total_execution_time = Column(Float, nullable=True)
+	
+	# Metadata
+	created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+	updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+	
+	# Foreign keys
+	user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True)
+	
+	# Relationships
+	user = relationship("User", back_populates="workflows")
+	workflow_steps = relationship("WorkflowStep", back_populates="workflow", cascade="all, delete-orphan")
+	
+	def __repr__(self) -> str:
+		return f"<Workflow(id={self.id}, name={self.name}, status={self.status})>"
+
+
+class WorkflowStep(Base):
+	"""WorkflowStep model for storing individual steps in a workflow."""
+	
+	__tablename__ = "workflow_steps"
+	
+	# Primary key
+	id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+	
+	# Step configuration
+	step_name = Column(String(255), nullable=True)
+	agent_id = Column(UUID(as_uuid=True), ForeignKey("agents.id"), nullable=False, index=True)
+	message = Column(Text, nullable=False)
+	
+	# Execution results
+	response = Column(Text, nullable=True)
+	tools_used = Column(JSON, nullable=True)  # List of tool names used
+	execution_time = Column(Float, nullable=True)
+	status = Column(String(50), default="pending", nullable=False)  # pending, running, success, error, skipped
+	error_message = Column(Text, nullable=True)
+	
+	# Dependencies
+	depends_on = Column(JSON, nullable=True)  # List of step names this depends on
+	pass_result_to = Column(JSON, nullable=True)  # List of step names to pass result to
+	
+	# Metadata
+	created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+	updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+	
+	# Foreign keys
+	workflow_id = Column(UUID(as_uuid=True), ForeignKey("workflows.id"), nullable=False, index=True)
+	
+	# Relationships
+	workflow = relationship("Workflow", back_populates="workflow_steps")
+	agent = relationship("Agent")
+	
+	def __repr__(self) -> str:
+		return f"<WorkflowStep(id={self.id}, step_name={self.step_name}, status={self.status})>"

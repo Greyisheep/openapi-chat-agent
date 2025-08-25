@@ -23,14 +23,16 @@ class Base(DeclarativeBase):
     )
 
 
-# Create async engine
+# Create async engine with optimized settings for parallel execution
 engine = create_async_engine(
     settings.DATABASE_URL,
     echo=settings.DEBUG,
-    pool_size=10,
-    max_overflow=20,
+    pool_size=20,  # Increased for parallel workflows
+    max_overflow=40,  # Increased for parallel workflows
     pool_pre_ping=True,
     pool_recycle=3600,  # Recycle connections every hour
+    pool_timeout=30,  # Timeout for getting connection from pool
+    pool_reset_on_return='commit',  # Reset connection state on return
 )
 
 # Create async session factory

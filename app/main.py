@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 import logging
 
 from app.core.agent_manager import AgentManager
-from app.api.routes import agents, health, auth, marketplace
+from app.api.routes import agents, health, auth, marketplace, workflows
 from app.utils.logging import setup_logging
 from app.database.config import init_db, close_db
 from app.core.config import settings
@@ -66,6 +66,7 @@ app.include_router(health.router, prefix="/health", tags=["Health"])
 app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 app.include_router(marketplace.router, prefix="/marketplace", tags=["Marketplace"])
 app.include_router(agents.router, prefix="/api/v1/agents", tags=["Agents"])
+app.include_router(workflows.router, prefix="/api/v1/workflows", tags=["Workflows"])
 
 
 @app.middleware("http")

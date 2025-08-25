@@ -16,7 +16,7 @@ def _import_adk():
 		# Based on ADK docs: google-adk package with specific imports
 		from google.adk.agents import LlmAgent  # type: ignore
 		from google.adk.models import Gemini  # type: ignore 
-		from google.adk.tools.openapi_tool import OpenAPIToolset  # type: ignore
+		from google.adk.tools.openapi_tool.openapi_spec_parser.openapi_toolset import OpenAPIToolset  # type: ignore
 		return {
 			'LlmAgent': LlmAgent,
 			'GeminiModel': Gemini, 
@@ -72,9 +72,9 @@ class ADKAgentWrapper:
 				)
 			elif self._auth_type == "bearer":
 				# Standard Bearer: Authorization: Bearer <token>
-				auth_value = f"Bearer {api_key}"
+				# For oauth2Token, ADK expects just the token value, not the full header
 				auth_scheme, auth_credential = auth_helpers.token_to_scheme_credential(
-					"bearer", "header", self._auth_header, auth_value
+					"oauth2Token", "header", self._auth_header, api_key
 				)
 			elif self._auth_type == "api_key":
 				# API Key style: X-API-Key: <token>
@@ -88,10 +88,10 @@ class ADKAgentWrapper:
 					"apikey", "header", self._auth_header, auth_value
 				)
 			else:
-				# Fallback to bearer if no specific type matches
-				auth_value = f"Bearer {api_key}"
+				# Fallback to oauth2Token (bearer) if no specific type matches
+				# For oauth2Token, ADK expects just the token value, not the full header
 				auth_scheme, auth_credential = auth_helpers.token_to_scheme_credential(
-					"bearer", "header", self._auth_header, auth_value
+					"oauth2Token", "header", self._auth_header, api_key
 				)
 			
 			self._openapi_toolset = adk_components['OpenAPIToolset'](

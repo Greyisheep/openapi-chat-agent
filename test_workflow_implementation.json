@@ -1,0 +1,125 @@
+{
+  "info": {
+    "name": "Multi-Agent Workflow Test",
+    "description": "Complete test of the workflow orchestration system",
+    "version": "1.0.0"
+  },
+  "test_sequence": [
+    {
+      "step": "1",
+      "name": "Register Test User", 
+      "method": "POST",
+      "url": "http://localhost:8000/auth/register",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "email": "workflow-test@example.com",
+        "username": "workflowtest",
+        "password": "testpassword123",
+        "full_name": "Workflow Test User"
+      }
+    },
+    {
+      "step": "2", 
+      "name": "Login and Get Token",
+      "method": "POST",
+      "url": "http://localhost:8000/auth/login",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "email_or_username": "workflowtest",
+        "password": "testpassword123"
+      }
+    },
+    {
+      "step": "3",
+      "name": "Create First Agent (GitHub-like)",
+      "method": "POST", 
+      "url": "http://localhost:8000/api/v1/agents/",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {TOKEN_FROM_STEP_2}"
+      },
+      "body": {
+        "name": "GitHub Analytics Agent",
+        "openapi_spec_url": "https://api.github.com/openapi.yaml",
+        "user_api_key": "test-github-key-123",
+        "user_instructions": "You analyze GitHub repositories and provide insights about code activity, issues, and development patterns."
+      }
+    },
+    {
+      "step": "4",
+      "name": "Create Second Agent (Slack-like)",
+      "method": "POST",
+      "url": "http://localhost:8000/api/v1/agents/",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {TOKEN_FROM_STEP_2}"
+      },
+      "body": {
+        "name": "Slack Notification Agent", 
+        "openapi_spec_url": "https://slack.com/api/openapi.json",
+        "user_api_key": "test-slack-key-456",
+        "user_instructions": "You send notifications and manage team communications via Slack channels."
+      }
+    },
+    {
+      "step": "5",
+      "name": "Test Simple Chain Workflow",
+      "method": "POST",
+      "url": "http://localhost:8000/api/v1/workflows/simple-chain",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {TOKEN_FROM_STEP_2}"
+      },
+      "body": {
+        "agent_ids": ["{AGENT_1_ID}", "{AGENT_2_ID}"],
+        "message": "Analyze the project activity and send a summary notification",
+        "workflow_name": "Project Analysis & Notification",
+        "parallel_execution": false
+      }
+    },
+    {
+      "step": "6", 
+      "name": "Test Complex Workflow",
+      "method": "POST",
+      "url": "http://localhost:8000/api/v1/workflows/execute",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {TOKEN_FROM_STEP_2}"
+      },
+      "body": {
+        "workflow_name": "Advanced Multi-API Orchestration",
+        "description": "Demonstrates complex dependency management and data passing between agents",
+        "steps": [
+          {
+            "agent_id": "{AGENT_1_ID}",
+            "message": "Get repository statistics and recent activity",
+            "step_name": "analyze_repo",
+            "depends_on": [],
+            "pass_result_to": ["send_notification"]
+          },
+          {
+            "agent_id": "{AGENT_2_ID}",
+            "message": "Send notification about repository analysis results",
+            "step_name": "send_notification", 
+            "depends_on": ["analyze_repo"],
+            "pass_result_to": []
+          }
+        ],
+        "parallel_execution": false
+      }
+    },
+    {
+      "step": "7",
+      "name": "Get Workflow History",
+      "method": "GET",
+      "url": "http://localhost:8000/api/v1/workflows/history",
+      "headers": {
+        "Authorization": "Bearer {TOKEN_FROM_STEP_2}"
+      }
+    }
+  ]
+}
